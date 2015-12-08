@@ -1,10 +1,10 @@
 ---
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
+title: 'Reproducible Research: Peer Assessment 1'
 author: "Bui Dinh Ngoc"
 date: "8 Dec 2015"
-
+output:
+  pdf_document: default
+  html_document: null
 ---
 
 
