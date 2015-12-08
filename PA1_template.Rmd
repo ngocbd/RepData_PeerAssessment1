@@ -11,7 +11,7 @@ date: "8 Dec 2015"
 ## Loading and preprocessing the data
 # 1.Load the data (i.e. read.csv()) some lib require here
 ```{r}
-install.packages("readr")
+
 library(readr)
 library(data.table)
 library(plyr)
@@ -77,22 +77,25 @@ median
 ## Are there differences in activity patterns between weekdays and weekends?
 ```{r}
 
-weekpart = function(x){
-        if(x %in% c('Saturday', 'Sunday')){
-                return('Weekend')
-        }
-
-        return('Weekday')
-}
-dat2$dayname = weekdays(as.Date(dat2$date))
-dat2$daytype  = as.factor(apply(as.matrix(dat2$dayname), 1, weekpart))
-
-dat2
-str(dat2)
 
 
-avgStep2 <- ddply(dat2, .(interval, day), summarize, steps = mean(steps))
-xyplot(steps ~ interval | day, data = avgStep2, type = "l", layout = c(1, 2), 
-    xlab = "Interval", ylab = "Number of steps", main = "Average steps by day")
+dat2$weekdays <- factor(format(dat2$date, "%A"))
+levels(dat2$weekdays)
+levels(dat2$weekdays) <- list(weekday = c("Monday", "Tuesday",
+                                             "Wednesday", 
+                                             "Thursday", "Friday"),
+                                 weekend = c("Saturday", "Sunday"))
+levels(dat2$weekdays)
+table(dat2$weekdays)
+
+avgSteps <- aggregate(dat2$steps, 
+                      list(interval = as.numeric(as.character(dat2$interval)), 
+                           weekdays = dat2$weekdays),
+                      FUN = "mean")
+names(avgSteps)[3] <- "meanOfSteps"
+library(lattice)
+xyplot(avgSteps$meanOfSteps ~ avgSteps$interval | avgSteps$weekdays, 
+       layout = c(1, 2), type = "l", 
+       xlab = "Interval", ylab = "Number of steps")
 
 ```
