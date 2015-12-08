@@ -9,19 +9,90 @@ date: "8 Dec 2015"
 
 
 ## Loading and preprocessing the data
+# 1.Load the data (i.e. read.csv()) some lib require here
+```{r}
+install.packages("readr")
+library(readr)
+library(data.table)
+library(plyr)
+library(lattice)
 
+dat = read_csv('activity.zip',na='NA',col_types='dcd')
 
+names(dat)
+head(dat)
+str(dat)
+
+```
+# Process/transform the data (if necessary) into a format suitable for your analysis
+# Convert the 2nd column to Date type:   
+
+```{r}
+dat$date<-as.Date(dat$date, "%Y-%m-%d")
+head(dat)
+```
 
 ## What is mean total number of steps taken per day?
 
+```{r}
+  tidydata<-na.omit(dat)
+steps<-aggregate(steps ~ date, tidydata, sum)
+hist(steps$steps, main="Total number of steps taken per day", xlab="Steps per Day", col="green")
+mean<-mean(steps$steps)
+median<-median(steps$steps)
+mean
+median
+  
+```
 
 
 ## What is the average daily activity pattern?
+```{r}
+Interval<-unique(tidydata$interval)
+avgStep <- tapply(tidydata$steps, tidydata$interval, mean)
+##and plot
+plot(Interval,avgStep,type="l",ylab="Average steps", main="Average steps per interval")
 
-
-
+maximum <- names(which.max(avgStep))
+maximum
+```
 ## Imputing missing values
+```{r}
+missing <- nrow(dat)-nrow(tidydata)
+missing
+isna <- is.na(dat)
+dat2 <- dat
+dat2$steps[which(isna)] <- avgStep[match(dat$interval[which(isna)], dat$interval)]
 
+steps2 <- aggregate(steps ~ date, dat2, sum)
+hist(steps2$steps, main="Total number of steps taken per day", xlab="Steps per Day", col="green")
 
+mean <- mean(steps2$steps)
+median<- median(steps2$steps)
+mean
+median
+
+```
 
 ## Are there differences in activity patterns between weekdays and weekends?
+```{r}
+
+weekpart = function(x){
+        if(x %in% c('Saturday', 'Sunday')){
+                return('Weekend')
+        }
+
+        return('Weekday')
+}
+dat2$dayname = weekdays(as.Date(dat2$date))
+dat2$daytype  = as.factor(apply(as.matrix(dat2$dayname), 1, weekpart))
+
+dat2
+str(dat2)
+
+
+avgStep2 <- ddply(dat2, .(interval, day), summarize, steps = mean(steps))
+xyplot(steps ~ interval | day, data = avgStep2, type = "l", layout = c(1, 2), 
+    xlab = "Interval", ylab = "Number of steps", main = "Average steps by day")
+
+```
