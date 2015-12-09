@@ -45,7 +45,7 @@ mean
 median
   
 ```
-
+![total number of steps taken per day](https://raw.githubusercontent.com/ngocbd/RepData_PeerAssessment1/master/totalnumberofstepperday.png)
 
 ## What is the average daily activity pattern?
 ```{r}
@@ -57,6 +57,8 @@ plot(Interval,avgStep,type="l",ylab="Average steps", main="Average steps per int
 maximum <- names(which.max(avgStep))
 maximum
 ```
+![average daily activity](https://raw.githubusercontent.com/ngocbd/RepData_PeerAssessment1/master/avgstepperinterval.png)
+
 ## Imputing missing values
 ```{r}
 missing <- nrow(dat)-nrow(tidydata)
@@ -100,3 +102,4 @@ xyplot(avgSteps$meanOfSteps ~ avgSteps$interval | avgSteps$weekdays,
        xlab = "Interval", ylab = "Number of steps")
 
 ```
+![activity patterns between weekdays and weekends](https://raw.githubusercontent.com/ngocbd/RepData_PeerAssessment1/master/weekend-weekday.png)
